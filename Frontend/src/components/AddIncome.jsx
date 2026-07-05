@@ -10,14 +10,14 @@ const AddIncome = () => {
   const [date, setDate] = useState();
   const navigate = useNavigate();
 
-  const onSubmit = async (e) => {
+  const onSubmit =  (e) => {
     e.preventDefault();
-    const handleIncome = addIncome(amount,date,description,category)
+    addIncome(amount,date,description,category)
       .then((data) => {
-        navigate(-1)
+        navigate(-1);
       })
       .catch((error)=> {
-        alert(error.message)
+        console.log(error.message);
       })
   }
 

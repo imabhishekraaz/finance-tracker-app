@@ -189,7 +189,7 @@ export const addIncome = async (amount, date, description, category) => {
  * - URL - /api/expense/add
  */
 
-const addExpense = async (amount, description, date, category) => {
+export const addExpense = async (amount, description, date, category) => {
 
   const token = localStorage.getItem('token');
 

@@ -40,8 +40,6 @@ const Dashboard = () => {
 
         setIncomeList(incomes);
         setExpenseList(expenses);
-        console.log(expenses)
-        console.log(transactions)
       } else {
         console.error("Failed to load profile:", result.data.message);
       }
@@ -49,7 +47,7 @@ const Dashboard = () => {
     fetchUserData();
   }, []);
 
-  // Get the unique data of the income 
+  // Get the unique data for the income 
   const uniqueDataOfIncome =
     Object.values(
       incomeList.reduce((acc, item) => {

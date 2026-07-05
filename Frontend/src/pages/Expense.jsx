@@ -43,11 +43,38 @@ const Expense = () => {
   const [expenseList, setExpenseList] = useState([]);
   const [timeframe, setTimeframe] = useState('Monthly');
   const [totalExpense, setTotalExpense] = useState(0);
+  const [average,setAverage] = useState();
   const navigate = useNavigate();
   useDocumentTitle('Expense - FinFlow');
 
+
+  const AverageExpense = () => {
+    getExpense()
+      .then((res) => {
+        const itemsArray = res.data.data;
+        const length = Number(itemsArray.length);
+        const totalExpense = itemsArray.reduce((sum,item)=>{
+          return sum + Number(item.amount)
+        },0);
+        const expenseAverage = length === 0 ? 0 : Number(totalExpense/length).toFixed(2);
+        setAverage(expenseAverage);
+      })
+  };
+
+  const uniqueData =
+    Object.values(
+      expenseList.reduce((acc, item) => {
+        if (!acc[item.category]) {
+          acc[item.category] = { ...item };
+        } else {
+          acc[item.category].amount += item.amount;
+        }
+        return acc;
+      }, {})
+    );
+
   useEffect(() => {
-    
+
     const getExpenseData = async () => {
       const expData = await getExpense();
       const totalExp = await getUserTransection();
@@ -60,15 +87,17 @@ const Expense = () => {
       }
     }
     getExpenseData();
+    // Set the average expense 
+    AverageExpense();
   }, []);
 
   const expenseChart = {
-    labels: expenseList.length === 0
+    labels: uniqueData.length === 0
       ? ['No Data']
-      : expenseList.map(item => item.title || item.category || 'Expense'),
+      : uniqueData.map(item => item.title || item.category || 'Expense'),
     datasets: [{
       label: 'Exoense',
-      data: expenseList.length === 0 ? [0] : expenseList.map(item => Number(item.amount)),
+      data: uniqueData.length === 0 ? [0] : uniqueData.map(item => Number(item.amount)),
       backgroundColor: '#DC143C',
       borderRadius: 3,
       barThickness: 30
@@ -125,7 +154,7 @@ const Expense = () => {
               ))}
             </div>
 
-            <button className={expenseStyles.addBtn} onClick={()=> navigate('/addexpense')}>Add Expense</button>
+            <button className={expenseStyles.addBtn} onClick={() => navigate('/addexpense')}>Add Expense</button>
           </div>
         </div>
 
@@ -149,7 +178,7 @@ const Expense = () => {
           <div className={expenseStyles.card}>
             <div>
               <p className={expenseStyles.cardTitle}>Average Expense</p>
-              <h3 className={expenseStyles.cardValue}>$0</h3>
+              <h3 className={expenseStyles.cardValue}>${average}</h3>
               <p className={expenseStyles.cardSubtext}>
                 <IonIcon icon={calendarOutline} /> {timeframe} Data
               </p>
