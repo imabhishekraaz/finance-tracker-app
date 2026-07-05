@@ -5,30 +5,41 @@ import { loginPage } from '../styles/loginAndSignup';
 import { IonIcon } from "@ionic/react";
 import { logoFacebook, logoGoogle, logoTwitter, logoReddit } from "ionicons/icons";
 import { handleLogin } from '../api/api';
- 
+import useDocumentTitle from '../hooks/useDocumentTitle';
+
 
 const LoginPage = () => {
     const navigate = useNavigate();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    useDocumentTitle('Login - FinFlow')
 
-    // 1. Added async keyword here so we can await the API handler
-    const onSubmit = async (e) => {
-        e.preventDefault();
-        setError('');
+    useEffect(() => {
+        
+        const token = localStorage.getItem('token');
 
-        // 2. Await the response since handleLogin returns a promise
-        const result = await handleLogin(email, password);
+        if (token) {
+            navigate('/');
+        }
+    }, [navigate])
 
-        if (result.success) {
-            navigate('/');  
-        } else {
-            setError(result.message);
+    const LoginHandler = async (e) => {
+        try {
+            e.preventDefault();
+
+            const result = await handleLogin(email, password);
+
+            if (result.success) {
+                setError('');
+                navigate("/");
+            } else {
+                setError(result.message);
+            }
+        } catch(error) {
+            console.log(error.message);
         }
     };
-    
-
     return (
         <>
             <div className={loginPage.wrapper}>
@@ -39,7 +50,7 @@ const LoginPage = () => {
                             <h1 className={loginPage.name}>FinFlow</h1>
                         </div>
 
-                        <form onSubmit={onSubmit} className={loginPage.formContainer}>
+                        <form onSubmit={LoginHandler} className={loginPage.formContainer}>
                             <input
                                 onChange={(e) => setEmail(e.target.value)}
                                 type="email"
@@ -68,7 +79,7 @@ const LoginPage = () => {
                                     <a href="#" className={loginPage.forgetWrapper}>Forgot password?</a>
                                 </div>
                             </div>
-                        
+
                             {error && (
                                 <div className="w-full text-red-400 flex gap-5 justify-center" >
                                     <p className="">{error}</p>

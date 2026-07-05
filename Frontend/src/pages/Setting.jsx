@@ -3,9 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { IonIcon } from '@ionic/react';
 import { arrowBackCircleOutline } from 'ionicons/icons';
 import { settingStyle } from '../styles/style';
+import useDocumentTitle from '../hooks/useDocumentTitle';
 
 const Settings = () => {
   const navigate = useNavigate();
+  useDocumentTitle('Setting')
 
   const handleSafeBack = () => {
     // Check if the user has a history inside this tab session

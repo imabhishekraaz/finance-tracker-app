@@ -15,10 +15,8 @@ const Navbar = ({ data }) => {
     const [isProfileOpen, setIsProfileOpen] = useState(false);
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
-
     const navigate = useNavigate();
     const profileRef = useRef(null);
-
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -42,34 +40,33 @@ const Navbar = ({ data }) => {
 
     return (
         <>
-            <nav className={navbar.navbarWrapper}>
+            <nav className={`${navbar.navbarWrapper} flex items-center justify-between w-full`}>
 
-                {/* LEFT SIDE: BRANDING & HAMBURGER TRIGGER */}
                 <div className={navbar.hamburgerWraper}>
                     <button
-                        className={navbar.hamburger}
+                        className={`${navbar.hamburger} lg:hidden`} 
                         onClick={() => setIsDrawerOpen(true)}
                     >
                         <IonIcon icon={menuOutline} className={`${navbar.hamburgerIcon}`} />
                     </button>
 
-                    <img
-                        src={logo}
-                        alt="FinFlow Logo"
-                        className={`${navbar.logo} cursor-pointer`}
-                        onClick={() => handleNavigation('/')}
-                    />
-                    <h1
-                        className={`${navbar.logoText} cursor-pointer`}
-                        onClick={() => handleNavigation('/')}
-                    >
-                        FinFlow
-                    </h1>
+                    <div className="lg:flex items-center hidden">
+                        <img
+                            src={logo}
+                            alt="FinFlow Logo"
+                            className={`${navbar.logo} cursor-pointer`}
+                            onClick={() => handleNavigation('/')}
+                        />
+                        <h1
+                            className={`${navbar.logoText} cursor-pointer`}
+                            onClick={() => handleNavigation('/')}
+                        >
+                            FinFlow
+                        </h1>
+                    </div>
                 </div>
 
-                {/* RIGHT SIDE: NOTIFICATION & PROFILE DROPDOWN */}
                 <div className={navbar.rightSectin}>
-
                     {/* Notification Bell */}
                     <Link to='/notifications'>
                         <button className={navbar.notificationBell}>
@@ -78,7 +75,7 @@ const Navbar = ({ data }) => {
                         </button>
                     </Link>
 
-                    {/* Profile Interaction Area  */}
+                    {/* Profile   Area */}
                     <div
                         ref={profileRef}
                         className={navbar.profileDropDown}
@@ -111,28 +108,18 @@ const Navbar = ({ data }) => {
                             </div>
                         )}
                     </div>
-
                 </div>
             </nav>
 
-            {/* LEFT SIDE SLIDE-OUT DRAWER OVERLAY & CONTENT */}
             {isDrawerOpen && (
                 <>
-                    <div
-                        className={navbar.drawerOverlay}
-                        onClick={() => setIsDrawerOpen(false)}
-                    />
-
-                    <div
-                        className={navbar.drawerContent}
-                        style={{ transform: isDrawerOpen ? 'translateX(0)' : 'translateX(-100%)' }}
-                    >
+                    <div className={navbar.drawerOverlay} onClick={() => setIsDrawerOpen(false)} />
+                    <div className={navbar.drawerContent} style={{ transform: isDrawerOpen ? 'translateX(0)' : 'translateX(-100%)' }}>
                         <div>
-
                             <div className={navbar.drawerHeader}>
-                                <div className="flex items-center gap-2">
+                                <div className="flex flex-col gap-2">
                                     <p>{data?.data?.name || "Abhishek Raj"}</p>
-                                    <p>{data?.data?.name || 'ffabhishek116@gmail.com'}</p>
+                                    <p className='text-[10px]'>{data?.data?.name || 'ffabhishek116@gmail.com'}</p>
                                 </div>
                                 <button onClick={() => setIsDrawerOpen(false)} className="text-2xl text-gray-500 p-1">
                                     <IonIcon icon={closeOutline} />
@@ -140,26 +127,16 @@ const Navbar = ({ data }) => {
                             </div>
 
                             <div className="flex flex-col gap-1">
-                                <button onClick={() => handleNavigation('/')} className={navbar.profileTitle}>
-                                    Dashboard
-                                </button>
-                                <button onClick={() => handleNavigation('/income')} className={navbar.profileTitle}>
-                                    Income
-                                </button>
-                                <button onClick={() => handleNavigation('/expense')} className={navbar.profileTitle}>
-                                    Expense
-                                </button>
-                                <button onClick={() => handleNavigation('/settings')} className={navbar.setting}>
-                                    Settings
-                                </button>
+                                <button onClick={() => handleNavigation('/')} className={navbar.profileTitle}>Dashboard</button>
+                                <button onClick={() => handleNavigation('/income')} className={navbar.profileTitle}>Income</button>
+                                <button onClick={() => handleNavigation('/expense')} className={navbar.profileTitle}>Expense</button>
+                                <button onClick={() => handleNavigation('/settings')} className={navbar.setting}>Settings</button>
                             </div>
                         </div>
 
                         <div>
                             <hr className={navbar.hrTag} />
-                            <button onClick={handleLogout} className={navbar.logOutButton}>
-                                Log Out
-                            </button>
+                            <button onClick={handleLogout} className={navbar.logOutButton}>Log Out</button>
                         </div>
                     </div>
                 </>

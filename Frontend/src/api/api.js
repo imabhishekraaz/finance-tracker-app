@@ -7,6 +7,7 @@ export const handleLogin = async (email, password) => {
       body: JSON.stringify({ email, password })
     });
 
+
     const data = await response.json();
     if (response.ok) {
       localStorage.setItem('token', data.token);
@@ -55,6 +56,15 @@ export const getUserTransection = async () => {
         'Authorization': `Bearer ${token}`
       }
     });
+
+    // If the Token is expire or Invalid
+    if (response.status === 401) {
+      localStorage.removeItem('token');
+
+      window.location.replace('/login');
+      return null;
+    }
+
     // Check if the server responded with a 200-299 status code
     if (!response.ok) {
       const errorData = await response.json();
@@ -133,4 +143,83 @@ export const getExpense = async () => {
     }
   };
 };
+
+
+
+/**
+ * * Add expense
+ * * Method: "POST",
+ *- Request at - /api/income/add
+ */
+
+export const addIncome = async (amount, date, description, category) => {
+  const token = localStorage.getItem('token');
+  try {
+    const response = await fetch('http://localhost:4000/api/income/add', {
+      method: "POST",
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ amount, date, description, category })
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      return {
+        success: false,
+        error
+      }
+    }
+    const data = await response.json();
+    return {
+      success: true,
+      data
+    }
+  } catch (error) {
+    return {
+      success: false,
+      message: error.message
+    }
+  };
+};
+
+/**
+ * add income
+ * - METHOD - "POST"
+ * - URL - /api/expense/add
+ */
+
+const addExpense = async (amount, description, date, category) => {
+
+  const token = localStorage.getItem('token');
+
+  try {
+    const response = await fetch('http://localhost:4000/api/expense/add', {
+      method: "POST",
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ amount, description, date, category })
+    })
+    if (!response.ok) {
+      const errorDate = await response.json();
+      return {
+        success: false,
+        errorDate
+      }
+    };
+    // if data come with any error the received the data
+    const ExpenseData = await response.json();
+    return {
+      success: true,
+      ExpenseData
+    }
+  } catch(error) {
+    return {
+      success: false,
+      message:error.message
+    }
+  }
+}
 

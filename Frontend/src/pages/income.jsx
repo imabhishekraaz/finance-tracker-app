@@ -1,8 +1,7 @@
 // src/components/Income.jsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { IonIcon } from '@ionic/react';
 import {
-  alertCircleOutline,
   calendarOutline,
   pieChartOutline,
   refreshOutline,
@@ -10,42 +9,79 @@ import {
   logoUsd,
   trendingUpOutline
 } from 'ionicons/icons';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  ArcElement,
+  Title,
+  Tooltip,
+  Legend,
+} from "chart.js";
 
-import { incomeStyles } from '../styles/style';
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  ArcElement,
+  Title,
+  Tooltip,
+  Legend
+);
+
 import Navbar from '../components/Navbar';
-import { useEffect } from 'react';
-import { getIncome } from '../api/api';
-import { getUserTransection } from '../api/api';
+import { incomeStyles } from '../styles/style'; // Imported style dictionary
+import { getIncome, getUserTransection } from '../api/api';
 import { Doughnut } from 'react-chartjs-2';
+import useDocumentTitle from '../hooks/useDocumentTitle';
+import { useNavigate } from 'react-router-dom';
 
 const Income = () => {
+  const navigate = useNavigate()
   const [timeframe, setTimeframe] = useState('Monthly');
   const [totalIncome, setTotalIncome] = useState(0);
   const [transection, setTransection] = useState([]);
   const [average, setAverage] = useState(0);
-
-
-
+  useDocumentTitle('Income - FinFlow')
 
   useEffect(() => {
+
     const getIncomeData = async () => {
       try {
         const result = await getIncome();
         if (result.data.success) {
-          setTransection(() => result.data.incomes)
+          setTransection(result.data.incomes);
         }
 
         const totalIncomeResult = await getUserTransection();
         if (totalIncomeResult.data.success) {
-          setTotalIncome(totalIncomeResult.data.data.monthlyIncome)
+          setTotalIncome(totalIncomeResult.data.data.monthlyIncome);
         }
       } catch (error) {
-        console.log(error.message)
+        console.log(error.message);
       }
     };
 
+    getIncomeData();
+  }, []);
+
+  const uniqueData =
+    Object.values(
+      transection.reduce((acc, item) => {
+        if (!acc[item.category]) {
+          acc[item.category] = { ...item };
+        } else {
+          acc[item.category].amount += item.amount;
+        }
+        return acc;
+      }, {})
+    );
+
+
+  useEffect(() => {
     const totalIncomeSum = transection.reduce((sum, item) => {
-      return sum + Number(item.amount)
+      return sum + Number(item.amount);
     }, 0);
 
     const uniqueMonths = new Set(
@@ -63,14 +99,12 @@ const Income = () => {
       ? (totalIncomeSum / numberOfMonthsDynamic)
       : 0;
     setAverage(monthlyAverage);
-
-    getIncomeData();
-  }, []);
+  }, [transection]);
 
   const incomeChart = {
-    labels: transection.length === 0
+    labels: uniqueData.length === 0
       ? ['No Data']
-      : transection.map(item => item.title || item.category || 'Income'),
+      : uniqueData.map(item => item.title || item.category || 'Income'),
     datasets: [{
       label: 'Income',
       data: transection.length === 0 ? [0] : transection.map(item => Number(item.amount)),
@@ -84,13 +118,13 @@ const Income = () => {
     responsive: true,
     maintainAspectRatio: false,
     cutout: '60%',
-    radius : '80%',
+    radius: '80%',
     plugins: {
       legend: {
         display: true,
         position: 'bottom',
         labels: {
-          color: '#94a3b8',
+          color: '#000000',
           font: { size: 12 },
           boxWidth: 12,
           padding: 10
@@ -104,12 +138,10 @@ const Income = () => {
     }
   };
 
-
-
   return (
     <div className={incomeStyles.pageWrapper}>
+      <Navbar />
       <div className={incomeStyles.container}>
-        <Navbar />
 
         {/* 1. TOP HEADER SECTION */}
         <div className={incomeStyles.headerWrapper}>
@@ -132,7 +164,9 @@ const Income = () => {
               ))}
             </div>
 
-            <button className={incomeStyles.addBtn}>Add Income</button>
+            <button className={incomeStyles.addBtnIncome} onClick={() => navigate('/addincome')}>
+              Add Income
+            </button>
           </div>
         </div>
 
@@ -156,7 +190,7 @@ const Income = () => {
           <div className={incomeStyles.card}>
             <div>
               <p className={incomeStyles.cardTitle}>Average Income</p>
-              <h3 className={incomeStyles.cardValue}>${average}</h3>
+              <h3 className={incomeStyles.cardValue}>${Number(average).toFixed(2)}</h3>
               <p className={incomeStyles.cardSubtext}>
                 <IonIcon icon={calendarOutline} /> {timeframe} Data
               </p>
@@ -181,62 +215,69 @@ const Income = () => {
           </div>
         </div>
 
-        {/* 3. RECENT TRANSACTIONS & CATEGORY DETAILS */}
+        {/* RECENT TRANSACTIONS & CATEGORY DETAILS */}
         <div className={incomeStyles.bottomGrid}>
 
-          {/* Recent Transactions Panel */}
+          {/* Recent Transactions   */}
           <div className={incomeStyles.panelLarge}>
-            <div>
-              <div className={incomeStyles.panelHeader}>
-                <div className={incomeStyles.panelTitleContainer}>
-                  <IonIcon icon={timeOutline} />
-                  <span className={incomeStyles.panelTitleText}>Recent Transactions</span>
-                </div>
-                <button className={incomeStyles.panelRefreshBtn}>
-                  <IonIcon icon={refreshOutline} />
-                </button>
+            {/* Header Container */}
+            <div className={incomeStyles.panelHeader}>
+              <div className="flex items-center gap-2">
+                <IonIcon icon={timeOutline} className={incomeStyles.panelTitleContainer} />
+                <span className={incomeStyles.panelTitleText}>Recent Transactions</span>
               </div>
+              <button className={incomeStyles.panelRefreshBtn} onClick={() => window.location.reload()}>
+                <IonIcon icon={refreshOutline} />
+              </button>
             </div>
 
-            {/* Empty Table State */}
-            {transection.length === 0 ? (
-              <div>
-                <IonIcon icon={logoUsd} className="text-3xl text-gray-200" />
-                <p>No income transactions found.</p>
-              </div>
-            ) : (
-              <div className="p-4 space-y-2 flex flex-col ">
-                {transection.map((item, index) => (
-                  <div key={index} className="flex justify-between border-b border-gray-700 py-1">
-                    <span className="text-black">{item.category || 'Income Item'}</span>
-                    <span className="text-green-400 font-bold">+${item.amount}</span>
-                  </div>
-                ))}
-              </div>
-            )}
+            {/* Body Content Container */}
+            <div className={incomeStyles.listContentBody}>
+              {transection.length === 0 ? (
+                <div className={incomeStyles.emptyStateContainer}>
+                  <IonIcon icon={logoUsd} className="text-3xl text-gray-400 animate-pulse" />
+                  <p className={incomeStyles.emptyStateText}>No income transactions found.</p>
+                </div>
+              ) : (
+                <div className={incomeStyles.listWrapper}>
+                  {transection.slice().reverse().map((item, index) => (
+                    <div key={item._id || index} className={incomeStyles.listItemRow}>
+                      <div className={incomeStyles.itemLeftBlock}>
+                        <span className={incomeStyles.itemTitle}>
+                          {item.category || item.description || 'Income Item'}
+                        </span>
+                      </div>
+                      <span className={incomeStyles.itemAmountIncome}>
+                        +${Number(item.amount || 0).toFixed(2)}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Income Category/Chart Panel */}
           <div className={incomeStyles.panelSmall}>
+            {/* Panel Header */}
             <div className={incomeStyles.panelHeader}>
-              <div className={incomeStyles.panelTitleContainer}>
+              <div className="flex items-center gap-2">
                 <IonIcon icon={pieChartOutline} className="text-blue-500" />
-                <span className={incomeStyles.panelTitleText}>Income by Category</span>
+                <span className="font-bold text-sm text-black">Income by Category</span>
               </div>
             </div>
 
-            {/* Chart.js Sandbox Grid */}
+            {/* Chart Sandbox Wrapper */}
             <div className={incomeStyles.chartPlaceholder}>
               <Doughnut data={incomeChart} options={doughnutOptions} />
             </div>
 
-            {/* Footer Summary Blocks */}
+            {/* Footer Summary Row */}
             <div className={incomeStyles.chartFooterRow}>
               <div>
                 <p className={incomeStyles.footerLabel}>Total Income</p>
                 <p className={incomeStyles.footerValueIncome}>${totalIncome}</p>
               </div>
-              
             </div>
           </div>
 

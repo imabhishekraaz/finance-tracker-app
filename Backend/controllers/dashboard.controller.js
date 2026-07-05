@@ -30,7 +30,7 @@ export const getDashboardData = async (req, res) => {
         // Merge and Sort by 'date' field directly instead of 'createdAt'
         const recentTransactions = [...sanitizedIncomes, ...sanitizedExpenses]
             .sort((a, b) => new Date(b.date) - new Date(a.date))
-            .slice(0, 10); // Optional: Limit to top 10 recent transactions for dashboard efficiency
+            // .slice(0, 10); // Optional: Limit to top 10 recent transactions for dashboard efficiency
 
         // Calculate Category Breakdown
         const spendByCategory = {};

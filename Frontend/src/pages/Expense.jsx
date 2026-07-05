@@ -10,18 +10,44 @@ import {
   logoUsd,
   listOutline
 } from 'ionicons/icons';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  ArcElement,
+  Title,
+  Tooltip,
+  Legend,
+} from "chart.js";
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  ArcElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
 import { expenseStyles } from '../styles/style';
 import Navbar from '../components/Navbar';
 import { getExpense, getUserTransection } from '../api/api';
 import { Doughnut } from 'react-chartjs-2';
+import useDocumentTitle from '../hooks/useDocumentTitle';
+import { useNavigate } from 'react-router-dom';
+
 const Expense = () => {
 
   const [expenseList, setExpenseList] = useState([]);
   const [timeframe, setTimeframe] = useState('Monthly');
   const [totalExpense, setTotalExpense] = useState(0);
+  const navigate = useNavigate();
+  useDocumentTitle('Expense - FinFlow');
 
   useEffect(() => {
+    
     const getExpenseData = async () => {
       const expData = await getExpense();
       const totalExp = await getUserTransection();
@@ -78,7 +104,7 @@ const Expense = () => {
       <Navbar />
       <div className={expenseStyles.container}>
 
-        {/* 1. TOP HEADER SECTION */}
+        {/*  TOP HEADER SECTION */}
         <div className={expenseStyles.headerWrapper}>
           <div>
             <h1 className={expenseStyles.title}>Expense Overview</h1>
@@ -99,11 +125,11 @@ const Expense = () => {
               ))}
             </div>
 
-            <button className={expenseStyles.addBtn}>Add Expense</button>
+            <button className={expenseStyles.addBtn} onClick={()=> navigate('/addexpense')}>Add Expense</button>
           </div>
         </div>
 
-        {/* 2. STATS OVERVIEW CARDS */}
+        {/*  STATS OVERVIEW CARDS */}
         <div className={expenseStyles.statsGrid}>
           {/* Total Expense */}
           <div className={expenseStyles.card}>
@@ -170,13 +196,13 @@ const Expense = () => {
                 <p className={expenseStyles.emptyStateText}>No recent transactions tracked for this selection.</p>
               </div>
             ) : (
-               
+
               <div className={expenseStyles.listWrapper}>
                 {expenseList.map((item, index) => (
                   <div key={item._id || index} className={expenseStyles.listItemRow}>
                     <div className={expenseStyles.itemLeftBlock}>
                       <span className={expenseStyles.itemTitle}>
-                        {item.category || item.description || 'Income Item'}
+                        {item.category || item.description || 'Expense Item'}
                       </span>
                     </div>
                     <span className={expenseStyles.itemAmount}>

@@ -16,19 +16,23 @@ import { getUserTransection } from '../api/api';
 import { Bar, Doughnut } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, ArcElement, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
 ChartJS.register(CategoryScale, LinearScale, ArcElement, BarElement, Title, Tooltip, Legend);
+import useDocumentTitle from '../hooks/useDocumentTitle';
 
 const Dashboard = () => {
   const [dashboardData, setDashboardData] = useState(null);
   const [incomeList, setIncomeList] = useState([]);
   const [expenseList, setExpenseList] = useState([]);
+  const [savings, setSavings] = useState(0)
+  useDocumentTitle('Dashboard - FinFlow');
 
   useEffect(() => {
+
     const fetchUserData = async () => {
       const result = await getUserTransection();
 
       if (result.data.success && result.data) {
+
         setDashboardData(result.data.data);
-        console.log("Dashboard Payload:", result.data);
 
         const transactions = result.data.data.recentTransactions || [];
         const incomes = transactions.filter(item => item.type === 'income');
@@ -36,21 +40,48 @@ const Dashboard = () => {
 
         setIncomeList(incomes);
         setExpenseList(expenses);
+        console.log(expenses)
+        console.log(transactions)
       } else {
         console.error("Failed to load profile:", result.data.message);
       }
     };
-
     fetchUserData();
   }, []);
+
+  // Get the unique data of the income 
+  const uniqueDataOfIncome =
+    Object.values(
+      incomeList.reduce((acc, item) => {
+        if (!acc[item.category]) {
+          acc[item.category] = { ...item };
+        } else {
+          acc[item.category].amount += item.amount;
+        }
+        return acc;
+      }, {})
+    );
+
+    // Get the unique data of the Expense 
+  const uniqueDataOfExpense =
+    Object.values(
+      expenseList.reduce((acc, item) => {
+        if (!acc[item.category]) {
+          acc[item.category] = { ...item };
+        } else {
+          acc[item.category].amount += item.amount;
+        }
+        return acc;
+      }, {})
+    );
   // 1. Income Chart Configuration
   const incomeChart = {
-    labels: incomeList.length === 0
+    labels: uniqueDataOfIncome.length === 0
       ? ['No Data']
-      : incomeList.map(item => item.title || item.category || 'Income'),
+      : uniqueDataOfIncome.map(item => item.title || item.category || 'Income'),
     datasets: [{
       label: 'Income',
-      data: incomeList.length === 0 ? [0] : incomeList.map(item => Number(item.amount)),
+      data: uniqueDataOfIncome.length === 0 ? [0] : uniqueDataOfIncome.map(item => Number(item.amount)),
       backgroundColor: '#10b981',
       borderRadius: 6,
       barThickness: 30
@@ -58,17 +89,19 @@ const Dashboard = () => {
   };
 
   const expenseChart = {
-    labels: expenseList.length === 0
+    labels: uniqueDataOfExpense.length === 0
       ? ['No Data']
-      : expenseList.map(item => item.category || 'Expense'),
+      : uniqueDataOfExpense.map(item => item.category || 'Expense'),
     datasets: [{
       label: 'Expenses',
-      data: expenseList.length === 0 ? [0] : expenseList.map(item => Number(item.amount)),
+      data: uniqueDataOfExpense.length === 0 ? [0] : uniqueDataOfExpense.map(item => Number(item.amount)),
       backgroundColor: '#f43f5e',
       borderRadius: 6,
       barThickness: 30
     }]
   };
+
+
 
   // 1. Doughnut Chart Data
   const savingsChart = {
@@ -132,16 +165,6 @@ const Dashboard = () => {
       }
     }
   };
-
-
-  if (!dashboardData) {
-    return (
-      <div className="flex h-screen w-screen items-center justify-center bg-gray-900 text-white">
-        <p className="text-lg font-medium animate-pulse">Loading financial profile...</p>
-      </div>
-    );
-  }
-
   return (
     <>
       <Navbar data={dashboardData} />
@@ -161,7 +184,7 @@ const Dashboard = () => {
             <div className={dashboardStyles.card}>
               <div>
                 <p className={dashboardStyles.cardTitle}>Total Balance</p>
-                <h3 className={dashboardStyles.cardValue}>${dashboardData.savings || 0}</h3>
+                <h3 className={dashboardStyles.cardValue}>${dashboardData?.savings || 0}</h3>
                 <p className={dashboardStyles.cardSubtextGreen}>
                   <span className="font-bold">+0%</span> this month
                 </p>
@@ -175,7 +198,7 @@ const Dashboard = () => {
             <div className={dashboardStyles.card}>
               <div>
                 <p className={dashboardStyles.cardTitle}>Monthly Income</p>
-                <h3 className={dashboardStyles.cardValue}>${dashboardData.monthlyIncome || 0}</h3>
+                <h3 className={dashboardStyles.cardValue}>${dashboardData?.monthlyIncome || 0}</h3>
                 <p className={dashboardStyles.cardSubtextGreen}>
                   <span className="font-bold">+0%</span> this month
                 </p>
@@ -189,7 +212,7 @@ const Dashboard = () => {
             <div className={dashboardStyles.card}>
               <div>
                 <p className={dashboardStyles.cardTitle}>Monthly Expense</p>
-                <h3 className={dashboardStyles.cardValue}>${dashboardData.monthlyExpense || 0}</h3>
+                <h3 className={dashboardStyles.cardValue}>${dashboardData?.monthlyExpense || 0}</h3>
                 <p className={dashboardStyles.cardSubtextRed}>
                   <span className="font-bold">+0%</span> this month
                 </p>
@@ -203,7 +226,7 @@ const Dashboard = () => {
             <div className={dashboardStyles.card}>
               <div>
                 <p className={dashboardStyles.cardTitle}>Saving Rate</p>
-                <h3 className={dashboardStyles.cardValue}>{dashboardData.savingsRate || 0}%</h3>
+                <h3 className={dashboardStyles.cardValue}>{dashboardData?.savingsRate || 0}%</h3>
                 <p className={dashboardStyles.cardSubtextBlue}>
                   <span className="font-bold">+0%</span> this month
                 </p>
@@ -222,7 +245,7 @@ const Dashboard = () => {
               <div>
                 <p className={dashboardStyles.chartTitle}>Income Overview</p>
                 <h4 className={dashboardStyles.chartValue}>
-                  ${dashboardData.monthlyIncome || 0}
+                  ${dashboardData?.monthlyIncome || 0}
                 </h4>
               </div>
               <div className={dashboardStyles.chartPlaceholder}>
@@ -238,7 +261,7 @@ const Dashboard = () => {
               <div>
                 <p className={dashboardStyles.chartTitle}>Spent Overview</p>
                 <h4 className={dashboardStyles.chartValue}>
-                  ${dashboardData.monthlyExpense || 0}
+                  ${dashboardData?.monthlyExpense || 0}
                 </h4>
               </div>
               <div className={dashboardStyles.chartPlaceholder}>
@@ -254,7 +277,7 @@ const Dashboard = () => {
               <div>
                 <p className={dashboardStyles.chartTitle}>Savings Overview</p>
                 <h4 className={dashboardStyles.chartValue}>
-                  ${dashboardData.savings || 0}
+                  ${dashboardData?.savings || 0}
                 </h4>
               </div>
 
@@ -264,7 +287,7 @@ const Dashboard = () => {
 
                   <div className="absolute flex flex-col items-center justify-center pointer-events-none mb-6">
                     <span className="text-2xl font-bold text-white font-mono">
-                      {dashboardData.savingsRate || 0}%
+                      {dashboardData?.savingsRate || 0}%
                     </span>
                     <span className="text-[10px] uppercase tracking-wider text-gray-500 font-medium">
                       Saved
