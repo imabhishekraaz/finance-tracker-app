@@ -165,7 +165,7 @@ const Dashboard = () => {
   };
   return (
     <>
-      <Navbar data={dashboardData} />
+      <Navbar />
       <div className={dashboardStyles.pageWrapper}>
         <div className={dashboardStyles.container}>
 

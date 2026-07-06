@@ -10,17 +10,29 @@ import {
 } from 'ionicons/icons';
 import logo from '../assets/logo.png';
 import { Link } from 'react-router-dom';
- 
+import { getUserDetails } from '../api/api';
 
-const Navbar = ({ data }) => {
+
+const Navbar = () => {
     const [isProfileOpen, setIsProfileOpen] = useState(false);
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+    const [userData, setUserData] = useState()
 
     const navigate = useNavigate();
     const profileRef = useRef(null);
 
 
     useEffect(() => {
+
+        // Set the user name and email 
+        getUserDetails()
+            .then((res) => {
+                setUserData(res.data.user)
+            })
+            .catch((err) => {
+                window.alert('Something went wrong')
+                navigate('/login')
+            })
         const handleClickOutside = (event) => {
             if (profileRef.current && !profileRef.current.contains(event.target)) {
                 setIsProfileOpen(false);
@@ -29,7 +41,9 @@ const Navbar = ({ data }) => {
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
 
-       
+
+
+
     }, []);
 
     const handleNavigation = (path) => {
@@ -121,8 +135,8 @@ const Navbar = ({ data }) => {
                         <div>
                             <div className={navbar.drawerHeader}>
                                 <div className="flex flex-col gap-2">
-                                    <p>{data?.data?.name || "Abhishek Raj"}</p>
-                                    <p className='text-[10px]'>{data?.data?.name || 'ffabhishek116@gmail.com'}</p>
+                                    <p>{userData.name}</p>
+                                    <p className='text-[10px]'>{userData?.email}</p>
                                 </div>
                                 <button onClick={() => setIsDrawerOpen(false)} className="text-2xl text-gray-500 p-1">
                                     <IonIcon icon={closeOutline} />
