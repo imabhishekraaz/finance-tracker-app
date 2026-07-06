@@ -178,7 +178,7 @@ const Expense = () => {
           <div className={expenseStyles.card}>
             <div>
               <p className={expenseStyles.cardTitle}>Average Expense</p>
-              <h3 className={expenseStyles.cardValue}>${average}</h3>
+              <h3 className={expenseStyles.cardValue}>${average || 0}</h3>
               <p className={expenseStyles.cardSubtext}>
                 <IonIcon icon={calendarOutline} /> {timeframe} Data
               </p>

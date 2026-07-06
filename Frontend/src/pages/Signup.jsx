@@ -1,19 +1,41 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { IonIcon } from '@ionic/react'
 import { logoFacebook, logoGoogle, logoTwitter, logoReddit, ear } from "ionicons/icons";
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { signupPage } from '../styles/loginAndSignup';
+import { userRegister } from '../api/api';
 
 const Signup = () => {
+    const navigate = useNavigate();
     const [fisrtName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [phoneNo, setPhoneNo] = useState('');
 
-    const handleSignup = () => {
-        window.alert('Account Created!')
+    const fullName = `${fisrtName} ${lastName}`;
+
+    // Remove the token when user come on the signup page
+    useEffect(()=>{
+        const token = localStorage.getItem('token');
+        if(token){
+            localStorage.removeItem('token')
+        }
+    },[])
+    console.log(localStorage.getItem('token'))
+    
+    const handleSignup = (e) => {
+        e.preventDefault();
+        userRegister(fullName, email, password, String(phoneNo))
+            .then((res) => {
+                if(res.success === true){
+                    navigate('/')
+                }
+            })
+            .catch((error) => {
+                navigate('/signup');
+            })
     }
     return (
 

@@ -10,6 +10,7 @@ import {
 } from 'ionicons/icons';
 import logo from '../assets/logo.png';
 import { Link } from 'react-router-dom';
+ 
 
 const Navbar = ({ data }) => {
     const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -17,6 +18,7 @@ const Navbar = ({ data }) => {
 
     const navigate = useNavigate();
     const profileRef = useRef(null);
+
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -26,6 +28,8 @@ const Navbar = ({ data }) => {
         };
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
+
+       
     }, []);
 
     const handleNavigation = (path) => {
@@ -44,7 +48,7 @@ const Navbar = ({ data }) => {
 
                 <div className={navbar.hamburgerWraper}>
                     <button
-                        className={`${navbar.hamburger} lg:hidden`} 
+                        className={`${navbar.hamburger} lg:hidden`}
                         onClick={() => setIsDrawerOpen(true)}
                     >
                         <IonIcon icon={menuOutline} className={`${navbar.hamburgerIcon}`} />
@@ -88,8 +92,7 @@ const Navbar = ({ data }) => {
                         />
 
                         <div className={`${navbar.profileBigScWrapper} pointer-events-none`}>
-                            <p className={navbar.profileName}>Alex Carter</p>
-                            <p className={navbar.profileRole}>Admin</p>
+                            <p className={navbar.profileName}></p>
                         </div>
                         <IonIcon icon={chevronDownOutline} className={`${navbar.profileIcon} pointer-events-none`} />
 

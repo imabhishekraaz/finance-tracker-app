@@ -1,13 +1,24 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
-import Sidebar from './Sidebar';  
-import Navbar from './Navbar';    
+import Sidebar from './Sidebar';
+import Navbar from './Navbar';
+import { getUserDetails } from '../api/api';
 
 const ProtectedRoute = () => {
-    const isAuthenticated = localStorage.getItem("token") !== null; 
-    
-    // Dummy data
-    const userData = { data: { name: "Abhishek Raj", email: "ffabhishek116@gmail.com" } };
+    const isAuthenticated = localStorage.getItem("token") !== null;
+    const [userData,setUserData] = useState()
+
+    useEffect(() => {
+        getUserDetails()
+            .then((res) => {
+                if(!res.success){
+                    console.log(res)
+                }
+            })
+            .catch((err) => {
+                console.log(err.message);m
+            })
+    }, [])
 
     if (!isAuthenticated) {
         return <Navigate to="/login" replace />;

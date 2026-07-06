@@ -27,16 +27,19 @@ export const getUserDetails = async () => {
   try {
     // Get the Token
     const token = localStorage.getItem('token');
-    const response = await fetch('http:localhost/api/user/me', {
+    const response = await fetch('http://localhost:4000/api/user/me', {
       method: "GET",
-      headers: { 'Content-Type': 'application/json' },
-      'Authorization': `Bearer ${token}`
-
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      }
     });
 
     const data = await response.json();
-    console.log(data);
-    return { success: response.ok, data }
+    return {
+      success: true,
+      data
+    }
 
   } catch (error) {
     return {
@@ -215,11 +218,58 @@ export const addExpense = async (amount, description, date, category) => {
       success: true,
       ExpenseData
     }
-  } catch(error) {
+  } catch (error) {
     return {
       success: false,
-      message:error.message
+      message: error.message
     }
   }
 }
 
+/**
+ * - POST
+ * - URL - /api/user/register
+ */
+// Register a New User 
+export const userRegister = async (name, email, password, phoneNumber) => {
+  try {
+    const response = await fetch('http://localhost:4000/api/user/register', {
+      method: "POST",
+      headers:{
+        'Content-Type':'application/json'
+      },
+      body: JSON.stringify({
+        name,
+        email,
+        password,
+        phoneNumber
+      })
+    })
+
+    // if response if not valid
+    if (!response.ok) {
+      const errorData = await response.json();
+      return {
+        success: false,
+        errorData
+      }
+    };
+    
+    
+    // if response is valid then store it in the variable
+    const data = await response.json();
+    // save the token 
+    const token = data.token;
+    localStorage.setItem('token', token);
+
+    return {
+      success: true,
+      data
+    }
+  } catch (error) {
+    return {
+      success: false,
+      message: error.message
+    }
+  }
+};
