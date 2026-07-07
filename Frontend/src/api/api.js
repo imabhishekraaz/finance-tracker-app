@@ -3,7 +3,7 @@ var url = 'https://backend-u7i7.onrender.com';
 export const handleLogin = async (email, password) => {
 
   try {
-    const response = await fetch(`${url}}/api/user/login`, {
+    const response = await fetch(`${url}/api/user/login`, {
       method: "POST",
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password })
@@ -29,7 +29,7 @@ export const getUserDetails = async () => {
   try {
     // Get the Token
     const token = localStorage.getItem('token');
-    const response = await fetch(`${url}}/api/user/me`, {
+    const response = await fetch(`${url}/api/user/me`, {
       method: "GET",
       headers: {
         'Content-Type': 'application/json',
@@ -54,7 +54,7 @@ export const getUserTransection = async () => {
   try {
     const token = localStorage.getItem('token');
 
-    const response = await fetch(`${url}}/api/dashboard`, {
+    const response = await fetch(`${url}/api/dashboard`, {
       method: "GET",
       headers: {
         'Content-Type': 'application/json',
@@ -94,7 +94,7 @@ export const getUserTransection = async () => {
 export const getIncome = async () => {
   try {
     const token = localStorage.getItem('token');
-    const response = await fetch(`${url}}/api/income/get`, {
+    const response = await fetch(`${url}/api/income/get`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -123,7 +123,7 @@ export const getIncome = async () => {
 export const getExpense = async () => {
   try {
     const token = localStorage.getItem('token');
-    const response = await fetch(`${url}}/api/expense/get`, {
+    const response = await fetch(`${url}/api/expense/get`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -160,7 +160,7 @@ export const getExpense = async () => {
 export const addIncome = async (amount, date, description, category) => {
   const token = localStorage.getItem('token');
   try {
-    const response = await fetch(`${url}}/api/income/add`, {
+    const response = await fetch(`${url}/api/income/add`, {
       method: "POST",
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -199,7 +199,7 @@ export const addExpense = async (amount, description, date, category) => {
   const token = localStorage.getItem('token');
 
   try {
-    const response = await fetch(`${url}}/api/expense/add`, {
+    const response = await fetch(`${url}/api/expense/add`, {
       method: "POST",
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -235,7 +235,7 @@ export const addExpense = async (amount, description, date, category) => {
 // Register a New User 
 export const userRegister = async (name, email, password, phoneNumber) => {
   try {
-    const response = await fetch(`${url}}/api/user/register`, {
+    const response = await fetch(`${url}/api/user/register`, {
       method: "POST",
       headers:{
         'Content-Type':'application/json'
