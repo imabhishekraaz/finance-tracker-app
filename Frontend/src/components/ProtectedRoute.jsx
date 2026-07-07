@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import {  Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Navbar from './Navbar';
+import { Navigate } from 'react-router-dom';
 
 
 const ProtectedRoute = () => {
