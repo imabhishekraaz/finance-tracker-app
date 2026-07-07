@@ -18,7 +18,10 @@ const port = 4000;
 
 // middleware
 app.use(cors({
-  origin:'https://frontend-7ovc.onrender.com'
+  origin:'https://frontend-7ovc.onrender.com',
+  credentials: true, // Allow cookies/headers if needed
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
