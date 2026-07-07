@@ -18,7 +18,7 @@ const port = 4000;
 
 // middleware
 app.use(cors({
-  origin:'http://localhost:5173'
+  origin:'https://frontend-7ovc.onrender.com/login',
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
